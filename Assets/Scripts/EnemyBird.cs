@@ -21,10 +21,12 @@ public class EnemyBird : MonoBehaviour
     void Update()
     {
         // Is the bird to the left of the screen
-        if(transform.position.x < -screenBoundary.x * 2)
+        if (transform.position.x < -screenBoundary.x * 2)
         {
             // Delete the bird off the screen
             Destroy(this.gameObject);
         }
+
+
     }
 }
