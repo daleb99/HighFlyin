@@ -20,10 +20,23 @@ public class EnemyBird : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Is the bird to the left of the screen
+        // Is the game over yet?
+        if (GameController.Instance.gameIsOver)
+        {
+            // Yes: so we stop the bird from moving
+            rb.simulated = false;
+        }
+        else
+        {
+            // No: keep simulating the bird so it moves
+            // and can kill the player
+            rb.simulated = true;
+        }
+
+        // Check if the bird is still visible on the screen
         if (transform.position.x < -screenBoundary.x * 2)
         {
-            // Delete the bird off the screen
+            // Bird not visible - delete bird
             Destroy(this.gameObject);
         }
 

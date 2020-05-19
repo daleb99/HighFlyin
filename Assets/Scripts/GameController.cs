@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,36 +12,57 @@ public class GameController : MonoBehaviour
     
     public static GameController Instance;
 
+    /*
+     * GameObjects to simulate different
+     * game stages
+     */
+    public GameObject mainMenu;
     public GameObject startMenu;
     public GameObject endGame;
     public GameObject gameCountdown;
     public Text scoreText;
 
+    /*
+     * GameObject to display the elements of the game:
+     *  - Background
+     *  - Ground
+     *  - Clouds
+     *  - Airplane
+     *  - Birds
+     */
+    public GameObject environment;
+
     enum PageState
     {
         None,
+        MainMenu,
         Start,
         EndGame,
         GameCountdown
     }
 
-    int score = 0;
-    bool gameIsOver = true;
+    public int score = 0;
+    public bool gameIsOver = true;
 
     public bool GameOver { get { return gameIsOver; } }
     public int Score { get { return score;  } }
 
     void Awake()
     {
+        // When we start the game, hide the games environment
+        // so we can display the main menu to the user.
+        //environment.SetActive(false);
         Instance = this;
     }
 
+    // Subscribe to the events
     void OnEnable()
     {
         CountdownText.OnCountdownFinished += OnCountdownFinished;
         PlaneControl.OnPlayerCrashed += OnPlayerCrashed;
     }
 
+    // Unsubscribe from events
     void OnDisable()
     {
         CountdownText.OnCountdownFinished -= OnCountdownFinished;
@@ -50,9 +72,16 @@ public class GameController : MonoBehaviour
     void OnCountdownFinished()
     {
         SetPageState(PageState.None);
-        OnGameStarted();
+        scoreText.gameObject.SetActive(true);
         score = 0;
         gameIsOver = false;
+        OnGameStarted();
+    }
+
+    public void UpdateScore()
+    {
+        score++;
+        scoreText.text = "Score " + score.ToString();
     }
 
     void OnPlayerCrashed()
@@ -74,6 +103,11 @@ public class GameController : MonoBehaviour
         {
             case PageState.None:
                 startMenu.SetActive(false);
+                endGame.SetActive(false);
+                gameCountdown.SetActive(false);
+                break;
+            case PageState.MainMenu:
+                startMenu.SetActive(true);
                 endGame.SetActive(false);
                 gameCountdown.SetActive(false);
                 break;
@@ -99,18 +133,17 @@ public class GameController : MonoBehaviour
     {
         //Activated when replay button is pressed
         OnGameOverConfirmed(); // Event
-        scoreText.text = "0";
+        scoreText.text = "Score 0";
         SetPageState(PageState.Start);
     }
 
     void StartGame()
     {
-        //Activated when play button is pressed
-        SetPageState(PageState.GameCountdown);
-    }
 
-    public void incScore()
-    {
-        this.score++;
-    }
+        // *** We need to hide the main menu here ***
+
+        // When user presses play button, we change
+        // to the countdown screen
+        SetPageState(PageState.GameCountdown);
+    }   
 }
